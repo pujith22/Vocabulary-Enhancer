@@ -40,9 +40,6 @@ class Game:
 		# Bulding the Trie with valid words of the language.
 		for word in wordList:
 			self.wordLadder.insert(word)
-		self.wordLadder.insert("is")
-		print(self.wordLadder.search("is"))
-		sleep(4)
 		self.playerScores = []
 		for i in range(no_of_players):
 			self.playerScores.append(0)
@@ -60,7 +57,6 @@ class Game:
 				for i in range(startIndex,endIndex+1):
 					#if(self.GRID[rowIndex][i]!="_"):
 					word += self.GRID[rowIndex][i]
-				print(word)
 				if(self.wordLadder.search(word)):
 					if(len(word)>len(formedWord)):
 						formedWord = word
@@ -125,10 +121,7 @@ class Game:
 				rowIndex = tup[1]
 				colIndex = tup[2]
 				orientation = tup[3]
-				print(word)
-				print(self.visitedDict)
 				if(len(word)>=1):
-					print(word)
 					if (self.visitedDict.get(word)==None):
 						self.visitedDict[word]=True
 						self.playerScores[i]+=len(word)
