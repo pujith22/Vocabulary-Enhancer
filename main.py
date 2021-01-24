@@ -10,7 +10,8 @@ class Trie:
 			return True
 		else:
 			return False
-	
+#ScreenWidth defines the screen configuration of the device(to be acquired from os)
+ScreenLineWidth = 100
 from english_words import english_words_lower_alpha_set as wordList
 from PyDictionary import PyDictionary
 import time
@@ -80,8 +81,26 @@ class Game:
 
 	def printWelcomeScreen(self):
 		import pyfiglet  
-		result = pyfiglet.figlet_format("WELCOME TO VOCABULARY ENHANCER", font = "standard" ) 
-		print(result) 
+		screen = pyfiglet.figlet_format("WELCOME TO VOCABULARY ENHANCER", font = "standard" ) 
+		print(screen)
+		input("\n\n\n\tPress any key to Continue....")
+
+	def menuScreen(self):
+		menuString = "***MENU***\n\n"
+		option1 = "1. Offline Mode"
+		option2 = "2. Online Mode"
+		option3 = "3. Human vs Computer Mode"
+		inputString = "Please Enter Valid Input (1 or 2 or 3): "
+		inp = ""
+		print(menuString.center(ScreenLineWidth))
+		print(option1.ljust(ScreenLineWidth))
+		print(option2.ljust(ScreenLineWidth))
+		print(option3.ljust(ScreenLineWidth))
+		print("\n\n")
+		while(not(inp=="1" or inp=="2" or inp=="3")):
+			inp = input(inputString)
+		return int(inp)
+
 
 	def splashScreen(self):
 		system("cls")
@@ -100,6 +119,12 @@ class Game:
 			for j in range(self.COLUMNS):
 				print(self.GRID[i][j],end=" ")
 			print("\t\t\t")
+		print("\n\n")
+		for i in range(self.NOP):
+			print("\nWords formed by Player "+str(i+1)+": ",end="")
+			for tup in self.playerWordList[i]:
+				print(tup[0],end=", ")
+
 		print("\n\n\n\n\t\tSCORES:\n")
 		for i in range(self.NOP):
 			print("\t\tPlayer "+str(i+1)+": "+str(self.playerScores[i])+" ")
@@ -107,37 +132,45 @@ class Game:
 		print("Enter your input in the format(rowIndex,colIndex,character): ",end=" ")
 
 	def gameLogic(self):
-		self.print_game_screen()
-		while(not self.isFilled()):
-			for i in range(self.NOP):
-				sleep(2)
-				system("cls")
-				self.print_game_screen()
-				row,col,char = map(str,input().split())
-				row = int(row)
-				col = int(col)
-				tup = self.insert(row-1,col-1,char)				
-				word = tup[0]
-				rowIndex = tup[1]
-				colIndex = tup[2]
-				orientation = tup[3]
-				if(len(word)>=1):
-					if (self.visitedDict.get(word)==None):
-						self.visitedDict[word]=True
-						self.playerScores[i]+=len(word)
-						self.playerWordList.append(tup)
-						print("\n\tWord Formed: "+word)
-						print("\n\tMeaning: ")
-						print(self.meaningDict.meaning(word))
-						print("\n")
-						print("\n\tSynonyms: ")
-						print(self.meaningDict.synonym(word))
-						print("\n\tAntonyms: ")
-						print(self.meaningDict.antonym(word))
+		inp = self.menuScreen()
+		if(inp==1):
+			while(not self.isFilled()):
+				for i in range(self.NOP):
+					sleep(2)
+					system("cls")
+					self.print_game_screen()
+					row,col,char = map(str,input().split())
+					row = int(row)
+					col = int(col)
+					tup = self.insert(row-1,col-1,char)				
+					word = tup[0]
+					rowIndex = tup[1]
+					colIndex = tup[2]
+					orientation = tup[3]
+					if(len(word)>=1):
+						if (self.visitedDict.get(word)==None):
+							self.visitedDict[word]=True
+							self.playerScores[i]+=len(word)
+							self.playerWordList[i].append(tup)
+							print("\n\tWord Formed: "+word)
+							print("\n\tMeaning: ")
+							print(self.meaningDict.meaning(word))
+							print("\n")
+							print("\n\tSynonyms: ")
+							print(self.meaningDict.synonym(word))
+							print("\n\tAntonyms: ")
+							print(self.meaningDict.antonym(word))
+						else:
+							print("\nSorry, the word was already made. No score this time!")
 					else:
-						print("\nSorry, the word was already made. No score this time!")
-				else:
-					print("\nSorry, You are unable to make any valid word. Better luck next time!")
+						print("\nSorry, You are unable to make any valid word. Better luck next time!")
+			winner = 0
+			winnerScore = 0
+			for i in range(self.NOP):
+				if(self.playerScores[i]>winnerScore):
+					winnerScore = self.playerScores[i]
+					winner = i
+			print("Kudos to Player "+str(winner+1)+". You are the winner this time!")
 
 
 	def isFilled(self):
